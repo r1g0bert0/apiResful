@@ -14,3 +14,6 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::apiResource('fabricantes','FabricanteController');
+Route::apiResource('fabricantes.vehiculos','FabricanteVehiculoController');
+Route::apiResource('vehiculos','VehiculoController');
