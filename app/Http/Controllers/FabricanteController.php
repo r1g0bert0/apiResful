@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 
 class FabricanteController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth.basic',['only'=>['store','update','destroy']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -36,7 +40,7 @@ class FabricanteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return "return store";
     }
 
     /**
