@@ -23,16 +23,6 @@ class FabricanteController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -40,7 +30,11 @@ class FabricanteController extends Controller
      */
     public function store(Request $request)
     {
-        return "return store";
+        if (!$request->get('nombre') || !$request->get('telefono')) {
+            return response()->json(["Mensaje"=>"Datos inconpletos","codigo"=>"422"],422);    
+        }
+        Fabricante::create($request->all());
+        return response()->json(["Mensaje"=>"El fabricante ha sido creado exitosamente"],202);
     }
 
     /**
@@ -77,9 +71,31 @@ class FabricanteController extends Controller
      * @param  \App\Fabricante  $fabricante
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Fabricante $fabricante)
-    {
-        //
+    public function update(Request $request, $id)
+    {   //PUT es reemplazo completo de la entidad, PATCH sólo de una parte
+        $metodo=$request->method();
+        $fabricante=Fabricante::find($id);
+        if ($metodo==="PATCH") {//compara el valor y el tipo de metodo 
+            $nombre=$request->get('nombre');
+            if ($nombre!=null && $nombre!='') {
+                $fabricante->nombre=$nombre;
+            }
+            $telefono=$request->get('telefono');
+            if ($telefono!=null && $telefono!='') {
+                $fabricante->telefono=$telefono;
+            }
+            $fabricante->save();
+            return response()->json(["Mensaje"=>"El fabricante ha sido editado con PATCH"],202);
+        }
+           $nombre=$request->get('nombre');
+           $telefono=$request->get('telefono');
+           if (!$nombre || !$telefono) {
+            return response()->json(["Mensaje"=>"Datos invalidos para PUT"],404);
+           }
+           $fabricante->nombre=$nombre;
+           $fabricante->telefono=$telefono;
+           $fabricante->save();
+           return response()->json(["Mensaje"=>"El fabricante ha sido editado con PUT"],202);
     }
 
     /**

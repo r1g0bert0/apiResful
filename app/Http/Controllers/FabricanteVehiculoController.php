@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 class FabricanteVehiculoController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth.basic',['only'=>['store','update','destroy']]);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -40,9 +44,25 @@ class FabricanteVehiculoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
-        //
+        if (!$request->get('color') || !$request->get('cilindraje') || !$request->get('peso') || !$request->get('potencia')) {
+        return response()->json(["Mensaje"=>"Datos imconpletos","codigo"=>"422"],422);    
+    }
+
+    $fabricante=Fabricante::find($id);        
+    if (!$fabricante) {
+        return response()->json(["Mensaje"=>"Fabricante no exite","codigo"=>"404"],404);   
+    }
+
+    Vehiculo::create([
+        'color'=>$request->get('color'),
+        'potencia'=>$request->get('potencia'),
+        'cilindraje'=>$request->get('cilindraje'),
+        'peso'=>$request->get('peso'),
+        'fabricante_id'=>$id
+    ]);
+    return response()->json(["Mensaje"=>"Vehiculo creado"],201);
     }
 
     /**

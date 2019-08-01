@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Vehiculo;
+use App\Fabricante;
 use Illuminate\Http\Request;
 
 class VehiculoController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth.basic');
+        $this->middleware('auth.basic',['only'=>['store','update','destroy']]);
     }
     /**
      * Display a listing of the resource.
@@ -44,7 +45,7 @@ class VehiculoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**
