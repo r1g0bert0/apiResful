@@ -94,9 +94,55 @@ class FabricanteVehiculoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $idFabricante, $idVehiculo)
     {
-        //
+        $metodo=$request->method();
+        $fabricante=Fabricante::find($idFabricante);
+        if (!$fabricante) {
+            return response()->json(["Mensaje"=>"El fabricante no existe", "error"=>404],404);
+        }
+        $vehiculo=$fabricante->vehiculos()->find($idVehiculo);
+        if (!$vehiculo) {
+            return response()->json(["Mensaje"=>"No se encuentra el vehiculo", "error"=>404],404);
+        }
+        $cilindraje=$request->get('cilindraje');
+        $color=$request->get('color');
+        $potencia=$request->get('potencia');
+        $peso=$request->get('peso');
+        $sw=false;
+        if ($metodo==="PATCH") {//compara el valor y el tipo de metodo 
+            if ($color!=null && $color!='') {
+                $vehiculo->color=$color;
+                $sw=true;
+            }
+            if ($peso!=null && $peso!='') {
+                $vehiculo->peso=$peso;
+                $sw=true;
+            }
+            if ($cilindraje!=null && $cilindraje!='') {
+                $vehiculo->cilindraje=$cilindraje;
+                $sw=true;
+            }
+            if ($potencia!=null && $potencia!='') {
+                $vehiculo->potencia=$potencia;
+                $sw=true;
+            }
+            if ($sw) {
+                $vehiculo->save();
+                return response()->json(["Mensaje"=>"El vehiculo ha sido editado con PATCH"],202);
+            }
+            return response()->json(["Mensaje"=>"No se han guardado los cambios con PATCH","codigo"=>200],200);
+        }
+           
+           if (!$color || !$peso || !$cilindraje || !$potencia) {
+            return response()->json(["Mensaje"=>"Datos invalidos para PUT"],404);
+           }
+            $vehiculo->color=$color;
+            $vehiculo->peso=$peso;
+            $vehiculo->cilindraje=$cilindraje;
+            $vehiculo->potencia=$potencia;
+           $vehiculo->save();
+           return response()->json(["Mensaje"=>"El vehiculo ha sido editado con PUT"],202);
     }
 
     /**
@@ -105,8 +151,18 @@ class FabricanteVehiculoController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($idFabricante,$idVehiculo) //importa el orden de los IDs
+                                                       // por la URL fabricantes/{fabricante}/vehiculos/{vehiculo} 
     {
-        //
+        $fabricante=Fabricante::find($idFabricante);
+        if (!$fabricante) {
+            return response()->json(["Mensaje"=>"El fabricante no existe", "error"=>404],404);
+        }
+        $vehiculo=$fabricante->vehiculos()->find($idVehiculo);
+        if (!$vehiculo) {
+            return response()->json(["Mensaje"=>"No se encuentra el vehiculo", "error"=>404],404);
+        }
+        $vehiculo->delete();
+        return response()->json(["Mensaje"=>"El vehiculo ha sido eliminado"],200);
     }
 }

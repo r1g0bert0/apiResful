@@ -72,25 +72,33 @@ class FabricanteController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
-    {   //PUT es reemplazo completo de la entidad, PATCH sólo de una parte
+    {
         $metodo=$request->method();
         $fabricante=Fabricante::find($id);
-        if ($metodo==="PATCH") {//compara el valor y el tipo de metodo 
+        $sw=false;
+        if ($metodo==="PATCH") {//compara el valor y el tipo de metodo         
+        //con el motodo PATCH stas obligado a cambiar todos los campos
             $nombre=$request->get('nombre');
             if ($nombre!=null && $nombre!='') {
                 $fabricante->nombre=$nombre;
+                 $sw=true;
             }
             $telefono=$request->get('telefono');
             if ($telefono!=null && $telefono!='') {
                 $fabricante->telefono=$telefono;
+                 $sw=true;
             }
-            $fabricante->save();
-            return response()->json(["Mensaje"=>"El fabricante ha sido editado con PATCH"],202);
+            if ($sw) {
+                $fabricante->save();
+                return response()->json(["Mensaje"=>"El fabricante ha sido editado con PATCH"],202);
+            }
+            return response()->json(["Mensaje"=>"Datos nulos para PATCH"],200);
         }
+           //con el metodo PUT se puede cambiar parcialmente los campos
            $nombre=$request->get('nombre');
            $telefono=$request->get('telefono');
            if (!$nombre || !$telefono) {
-            return response()->json(["Mensaje"=>"Datos invalidos para PUT"],404);
+            return response()->json(["Mensaje"=>"Datos invalidos para"],404);
            }
            $fabricante->nombre=$nombre;
            $fabricante->telefono=$telefono;
@@ -104,8 +112,18 @@ class FabricanteController extends Controller
      * @param  \App\Fabricante  $fabricante
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Fabricante $fabricante)
+    public function destroy($id)
     {
-        //
+        $fabricante=Fabricante::find($id);
+        if (!$fabricante) {
+            return response()->json(["Mensaje"=>"El fabricante no existe", "error"=>404],404);
+        }
+        $vehiculos=$fabricante->vehiculos;
+        if (sizeof($vehiculos)>0) {
+            return response()->json(["Mensaje"=>"El fabricante posee vehiculos y no se puede eliminar",
+            "elimine los vehiculo primero", "error"=>404],404);
+        }
+        $fabricante->delete();
+        return response()->json(["Mensaje"=>"El fabricante ha sido eliminado"],200);
     }
 }
