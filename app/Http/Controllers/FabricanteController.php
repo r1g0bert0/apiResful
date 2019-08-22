@@ -19,7 +19,7 @@ class FabricanteController extends Controller
     public function index()
     {
         //return Fabricante::all();
-        return response()->json(["Datos"=>Fabricante::all()],202);
+        return response()->json(Fabricante::all(),202);
     }
 
     /**

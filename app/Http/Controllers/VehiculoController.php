@@ -24,7 +24,7 @@ class VehiculoController extends Controller
         if ( $vehiculo == null) {
             return response()->json(["Mensaje"=>"Vehiculo no encontrado","codigo"=>404],404);
         }
-        return response()->json(["Datos"=>$vehiculo],202);
+        return response()->json($vehiculo,202);
     }
 
     /**
